@@ -1,20 +1,33 @@
-from src.scraper import TweetScraper
-from src.processor import Processor
-from src.storage import Storage
-from src.analysis import Analyzer
+from src.scraper.twitter_scraper import scrape_tweets
+from src.processing.cleaner import clean_tweets
+from src.processing.deduplicator import deduplicate
+from src.storage.parquet_writer import write_parquet
+from src.analysis.text_to_signal import generate_signals
 
-if __name__ == '__main__':
-    scraper = TweetScraper(target_count=2000)
-    df = scraper.scrape()
+import logging
+import os
 
-    processor = Processor()
-    df = processor.clean(df)
 
-    store = Storage()
-    store.save_parquet(df)
+os.makedirs("logs", exist_ok=True)
+os.makedirs("data", exist_ok=True)
 
-    analysis = Analyzer()
-    X = analysis.vectorize(df)
-    analysis.plot_sample(X)
+logging.basicConfig(
+    filename="logs/app.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
-    print("Pipeline complete!")
+
+if __name__ == "__main__":
+    logging.info("Pipeline started")
+
+    raw_tweets = scrape_tweets()
+
+    cleaned = clean_tweets(raw_tweets)
+    unique = deduplicate(cleaned)
+
+    write_parquet(unique, "data/tweets.parquet")
+
+    generate_signals("data/tweets.parquet")
+
+    logging.info("Pipeline completed successfully")

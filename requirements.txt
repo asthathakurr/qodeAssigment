@@ -1,6 +1,6 @@
-selenium
-beautifulsoup4
+selenium>=4.10.0
+webdriver-manager
 pandas
-pyarrow
 scikit-learn
 matplotlib
+pyarrow
