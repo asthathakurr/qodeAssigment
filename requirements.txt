@@ -1,0 +1,6 @@
+selenium
+beautifulsoup4
+pandas
+pyarrow
+scikit-learn
+matplotlib
